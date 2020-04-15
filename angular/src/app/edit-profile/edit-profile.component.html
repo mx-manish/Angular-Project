@@ -1,0 +1,38 @@
+<h1>Update Profile</h1>
+<hr class="my-4">
+<div class="card col-md-12">
+    <div class="card-body">
+        <form [formGroup]="profileData" (ngSubmit)="updateProfile()">
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <input type="text" class="form-control" placeholder="name" formControlName="name">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <input type="email" class="form-control" placeholder="Email" formControlName="email">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <input type="string" class="form-control" placeholder="Mobile Number" formControlName="mobile">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <input type="string" class="form-control" placeholder="City" formControlName="city">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <input type="date" class="form-control" placeholder="Date of Birth" formControlName="dob">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <button type="submit" class="btn btn-primary" [disabled] = "profileData.invalid">Update Profile</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

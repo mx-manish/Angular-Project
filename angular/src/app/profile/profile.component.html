@@ -1,0 +1,35 @@
+<div class="container">
+    <div class="row">
+        <div class="card col-sm-12 col-md-6 col-lg-4 margin-top">
+            <div class="profile-pic" (mouseenter) ="showUploadButton = !showUploadButton"  (mouseleave) ="showUploadButton = !showUploadButton">
+                <img class="card-img-top" [src]="userProfile.profileURL" alt="Card image">
+                <div class="upload-btn-wrapper" *ngIf="showUploadButton">
+                    <button class="btn-1">Change</button>
+                    <input type="file" name="avatar" (change)="onFileChange($event)" />
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary col logout-btn" (click)="logoutUser()">Logout</button>
+            <div class="card-body">
+                <h4 class="card-title">{{userProfile.name}}</h4>
+                <p class="card-text">{{userProfile.email}}</p>
+                <p class="card-text">Mobile : {{userProfile.mobile}}</p>
+                <p class="card-text">CITY : {{userProfile.city}}</p>
+                <p class="card-text">DOB : {{userProfile.dob}}</p>
+                <div class="row">
+                    <button type="button" class="btn btn-dark col margin" (click)="showComponent('profile')">
+                        Edit Profile
+                    </button>
+                    <button type="button" class="btn btn-dark col" (click)="showComponent('password')">Change
+                        Password</button>
+                </div>
+            </div>
+        </div>
+        <div class="card col margin-top" *ngIf="showProfile">
+            <app-edit-profile [userData]="userProfile" (profileUpdated)="profileUpdateHandler($event)">
+            </app-edit-profile>
+        </div>
+        <div class="card col margin-top" *ngIf="showPasswordComponent">
+            <app-update-password [usedId]="userProfile.Id"></app-update-password>
+        </div>
+    </div>
+</div>
