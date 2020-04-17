@@ -29,10 +29,11 @@ export class HttpService {
    * 
    * @param userData Updated profile data.
    */
-  updatePassword(password, userId) {
+  updatePassword(password, userId, oldPassword) {
     const header = new HttpHeaders({
       useragentId: `${userId}`,
-      passToken: password
+      passToken: password,
+      oldPassword
     });
     return this.httpClient.post(`${URL.apiURL}/users/password`, {}, { headers: header })
   }

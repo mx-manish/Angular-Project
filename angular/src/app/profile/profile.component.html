@@ -1,7 +1,14 @@
+<div class="back-drop" *ngIf="showLoader">
+    <div class="loader">
+        <div class="spinner-grow text-light" style="width: 10vw; height: 10vw;" role="status">
+        </div>
+    </div>
+</div>
 <div class="container">
     <div class="row">
         <div class="card col-sm-12 col-md-6 col-lg-4 margin-top">
-            <div class="profile-pic" (mouseenter) ="showUploadButton = !showUploadButton"  (mouseleave) ="showUploadButton = !showUploadButton">
+            <div class="profile-pic" (mouseenter)="showUploadButton = !showUploadButton"
+                (mouseleave)="showUploadButton = !showUploadButton">
                 <img class="card-img-top" [src]="userProfile.profileURL" alt="Card image">
                 <div class="upload-btn-wrapper" *ngIf="showUploadButton">
                     <button class="btn-1">Change</button>
@@ -16,20 +23,10 @@
                 <p class="card-text">CITY : {{userProfile.city}}</p>
                 <p class="card-text">DOB : {{userProfile.dob}}</p>
                 <div class="row">
-                    <button type="button" class="btn btn-dark col margin" (click)="showComponent('profile')">
-                        Edit Profile
-                    </button>
-                    <button type="button" class="btn btn-dark col" (click)="showComponent('password')">Change
-                        Password</button>
+                    <a class="btn btn-dark col margin" routerLink="/update-profile" role="button">Edit Profile</a>
+                    <a class="btn btn-dark col margin" routerLink="/password" role="button">Change Password</a>
                 </div>
             </div>
-        </div>
-        <div class="card col margin-top" *ngIf="showProfile">
-            <app-edit-profile [userData]="userProfile" (profileUpdated)="profileUpdateHandler($event)">
-            </app-edit-profile>
-        </div>
-        <div class="card col margin-top" *ngIf="showPasswordComponent">
-            <app-update-password [usedId]="userProfile.Id"></app-update-password>
         </div>
     </div>
 </div>

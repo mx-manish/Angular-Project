@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpService } from '../services/http.service';
+import { StorageService } from '../services/storege.service';
 
 @Component({
   selector: 'app-update-password',
@@ -11,11 +12,17 @@ export class UpdatePasswordComponent implements OnInit {
 
   public passwordData: FormGroup;
   @Input() usedId: number;
-  constructor(private fb: FormBuilder, private httpService: HttpService) {
+  errMessage = '';
+  successMsg = '';
+  showLoader = false;
+  constructor(private fb: FormBuilder, private httpService: HttpService, private storage: StorageService) {
     this.initFormControl();
   }
 
   ngOnInit(): void {
+    const storageData = this.storage.getData('user');
+    const userData = (storageData && storageData.length > 10) ? JSON.parse(storageData) : false;
+    this.usedId = userData.Id;
   }
 
   initFormControl() {
@@ -30,13 +37,33 @@ export class UpdatePasswordComponent implements OnInit {
    * @description Password updated
    */
   updatePassword() {
-    this.httpService.updatePassword(this.passwordData.value.newPassword, this.usedId).subscribe((response: any) => {
-      if(response.code===200){
+    this.showLoader = true;
+    this.httpService.updatePassword(this.passwordData.value.newPassword, this.usedId, this.passwordData.value.password).subscribe((response: any) => {
+      this.showLoader = false;
+      if (response.code === 200) {
         this.passwordData.reset();
+        this.successMsg = response.message;
+        this.dismissAlert();
+      } else {
+        this.errMessage = response.message;
+        this.dismissAlert();
       }
+
     }, (err) => {
-      console.log(err);
+      this.showLoader = false;
+      this.errMessage = 'Somthing went wrong please try again later !';
+      this.dismissAlert();
     })
+  }
+
+  /**
+   * @description dismiss alert after 3 sec.
+   */
+  dismissAlert() {
+    setTimeout(() => {
+      this.successMsg = '';
+      this.errMessage = '';
+    }, 2000)
   }
 
 }

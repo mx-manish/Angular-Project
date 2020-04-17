@@ -23,7 +23,7 @@ import { UpdatePasswordComponent } from './update-password/update-password.compo
     UpdatePasswordComponent
   ],
   imports: [
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,

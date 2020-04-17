@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from '../services/http.service';
 import { Router } from '@angular/router';
+import { StorageService } from 'src/app/services/storege.service';
 
 @Component({
   selector: 'app-profile',
@@ -11,11 +12,12 @@ export class ProfileComponent implements OnInit {
   public userProfile;
   public showProfile = false;
   public showPasswordComponent = false;
-  showUploadButton = false;
-  constructor(private http: HttpService,private routing:Router) { }
+  public showUploadButton = false;
+  public showLoader = false;
+  constructor(private http: HttpService, private routing: Router, private storage: StorageService) { }
 
   ngOnInit(): void {
-    const storageData = window.localStorage.getItem('user');
+    const storageData = this.storage.getData('user');
     this.userProfile = (storageData && storageData.length > 10) ? JSON.parse(storageData) : false;
   }
 
@@ -33,23 +35,25 @@ export class ProfileComponent implements OnInit {
     this.userProfile = updateData;
   }
 
-  logoutUser(){
-    window.localStorage.clear();
+  logoutUser() {
+    this.storage.clearStorage();
     this.routing.navigateByUrl('/login');
   }
 
   onFileChange(evt) {
     console.log("Event taret value", evt.target.files);
     if (evt.target.files.length > 0) {
+      this.showLoader = true;
       const formData = new FormData();
       formData.append('avatar', evt.target.files[0])
       this.http.uploadAvatar(formData, this.userProfile.Id).subscribe((response: any) => {
+        this.showLoader = false;
         if (response.code) {
           this.userProfile.profileURL = response.data.profileURL;
-          window.localStorage.setItem("user", JSON.stringify(this.userProfile));
+          this.storage.setData('user', JSON.stringify(this.userProfile));
         }
       }, (err) => {
-        console.log("Error", err);
+        this.showLoader = false;
       });
     }
   }
