@@ -26,7 +26,7 @@ router.get('/', async function (req, res, next) {
     response.sendResponse(200, 'SUCCESS', users, res);
   } catch (err) {
     console.log("Error", err);
-    response.sendResponse(500, 'Error', err, res);
+    response.sendResponse(500, 'Internal server error', err, res);
   }
 });
 
@@ -52,7 +52,7 @@ router.post('/login', async function (req, res, next) {
     }
   } catch (err) {
     console.log("Error", err);
-    response.sendResponse(500, 'Error', err, res);
+    response.sendResponse(500, 'Internal server error', err, res);
   }
 });
 
@@ -66,20 +66,20 @@ router.post('/avatar', upload.single('avatar'), async function (req, res, next) 
       response.sendResponse(400, 'Invalid request session', [], res);
       return;
     }
-    if(!req.file.filename){
+    if (!req.file.filename) {
       response.sendResponse(400, 'Profile not uploaded', [], res);
       return;
     }
     const queryData = await queryEngine.executeQuery(`UPDATE users SET profileURL='${req.file.filename}' WHERE Id=${req.headers.useragentid}`);
     if (queryData.affectedRows > 0) {
       const profileURL = `http://localhost:3000/public/profile/${req.file.filename}`;
-      response.sendResponse(200, 'SUCCESS', {profileURL}, res);
+      response.sendResponse(200, 'SUCCESS', { profileURL }, res);
     } else {
       response.sendResponse(404, 'Somthing went wrong while updating', [], res);
     }
   } catch (err) {
     console.log("Error", err);
-    response.sendResponse(500, 'Error', err, res);
+    response.sendResponse(500, 'Internal server error', err, res);
   }
 });
 
@@ -99,16 +99,29 @@ router.post('/password', async function (req, res, next) {
     } else if (!passwordData) {
       response.sendResponse(400, 'User password required', [], res);
     } else {
-      const queryData = await queryEngine.executeQuery(`UPDATE users set email='${passwordData}' WHERE Id=${userId}`);
-      if (queryData.affectedRows > 0) {
-        response.sendResponse(200, 'SUCCESS', [], res);
+      const user = await queryEngine.executeQuery(`SELECT * FROM users WHERE Id=${userId}`);
+      if (user.length > 0) {
+        const oldPassword = req.headers.oldpassword;
+        console.log("Old password",oldPassword);
+        console.log("User",user[0]);
+        if (oldPassword !== user[0].password) {
+        console.log("Old password",oldPassword);
+          response.sendResponse(400, 'Old password is incorrect', [], res);
+          return;
+        }
+        const queryData = await queryEngine.executeQuery(`UPDATE users set password='${passwordData}' WHERE Id=${userId}`);
+        if (queryData.affectedRows > 0) {
+          response.sendResponse(200, 'SUCCESS', [], res);
+        } else {
+          response.sendResponse(404, 'Something went wrong', [], res);
+        }
       } else {
-        response.sendResponse(404, 'Something went wrong', [], res);
+        response.sendResponse(400, 'User not exists', [], res);
       }
     }
   } catch (err) {
     console.log("Error", err);
-    response.sendResponse(500, 'Error', err, res);
+    response.sendResponse(500, 'Internal server error', err, res);
   }
 
 });
@@ -131,7 +144,7 @@ router.post('/profile', async function (req, res, next) {
     }
   } catch (err) {
     console.log("Error", err);
-    response.sendResponse(500, 'Error', err, res);
+    response.sendResponse(500, 'Internal server error', err, res);
   }
 });
 
