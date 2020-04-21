@@ -5,6 +5,27 @@ const queryEngine = require('../common/mysql').queryEngine;
 const response = require('../common/response');
 const { v5: uuidv5 } = require('uuid');
 
+const jsonSchema = require('../schema/users').schema;
+const errorStore = require('../schema/users').errStore;
+const processError = require('../schema/processerror').processError;
+
+
+let Validator = require('jsonschema').Validator;
+let V = new Validator()
+
+function reqBodyValidation(body, bodySchema, errStore, resp) {
+  return new Promise((resolve, reject) => {
+    const validationResult = V.validate(body, bodySchema)
+    if (validationResult.valid) {
+      resolve(body)
+    } else {
+      const Error = processError(validationResult.errors, errStore);
+      response.sendResponse(400, Error, [], resp);
+    }
+  });
+}
+
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, __dirname + '/../public/profile')
@@ -32,12 +53,9 @@ router.get('/', async function (req, res, next) {
 
 /* GET users login. */
 router.post('/login', async function (req, res, next) {
-  const userData = req.body;
+
   try {
-    if (!userData.email || !userData.password) {
-      response.sendResponse(400, 'Email and password required', [], res);
-      return;
-    }
+    const userData = await reqBodyValidation(req.body, jsonSchema.userLoginSchema, errorStore.userLoginStore, res);
     const user = await queryEngine.executeQuery(`SELECT * FROM users WHERE email='${userData.email}' AND password='${userData.password}'`);
     if (user.length > 0) {
       const currentDate = new Date();
@@ -102,10 +120,7 @@ router.post('/password', async function (req, res, next) {
       const user = await queryEngine.executeQuery(`SELECT * FROM users WHERE Id=${userId}`);
       if (user.length > 0) {
         const oldPassword = req.headers.oldpassword;
-        console.log("Old password",oldPassword);
-        console.log("User",user[0]);
         if (oldPassword !== user[0].password) {
-        console.log("Old password",oldPassword);
           response.sendResponse(400, 'Old password is incorrect', [], res);
           return;
         }
@@ -130,12 +145,8 @@ router.post('/password', async function (req, res, next) {
  * @description User Profile update 
  */
 router.post('/profile', async function (req, res, next) {
-  const userData = req.body;
   try {
-    if (!userData.email || !userData.name || !userData.mobile || !userData.city || !userData.dob || !userData.user_id) {
-      response.sendResponse(400, 'Some details are missing', [], res);
-      return;
-    }
+    const userData = await reqBodyValidation(req.body, jsonSchema.userProfileSchema, errorStore.userProfileStore, res);
     const queryData = await queryEngine.executeQuery(`UPDATE users SET name='${userData.name}', email='${userData.email}', mobile='${userData.mobile}', city='${userData.city}', dob='${userData.dob}' WHERE Id=${userData.user_id}`);
     if (queryData.affectedRows > 0) {
       response.sendResponse(200, 'SUCCESS', [], res);
