@@ -22,6 +22,7 @@
                 <p class="card-text">Mobile : {{userProfile.mobile}}</p>
                 <p class="card-text">CITY : {{userProfile.city}}</p>
                 <p class="card-text">DOB : {{userProfile.dob}}</p>
+                <p class="card-text" *ngIf="userProfile.age">AGE : {{userProfile.age}} Yr.</p>
                 <div class="row">
                     <a class="btn btn-dark col margin" routerLink="/update-profile" role="button">Edit Profile</a>
                     <a class="btn btn-dark col margin" routerLink="/password" role="button">Change Password</a>

@@ -11,6 +11,8 @@ import { StorageService } from 'src/app/services/storege.service';
 })
 export class LoginComponent implements OnInit {
   public loginForm: FormGroup
+  errMessage = '';
+  showLoader = false;
   constructor(private fb: FormBuilder, private httpService: HttpService, private router: Router, private storage: StorageService) {
     this.initFormController();
   }
@@ -23,19 +25,34 @@ export class LoginComponent implements OnInit {
   }
 
   userLogin() {
+    this.showLoader=true;
     this.httpService.userLogin(this.loginForm.value).subscribe((response: ResponseObject) => {
       if (response.code === 200) {
         this.storage.setData('user', JSON.stringify(response.data));
+        this.showLoader=false;
         this.router.navigate(['profile']);
       } else {
-        console.log("Error");
+        this.showLoader=false;
+        this.errMessage = response.message;
+        this.dismissAlert();
       }
     }, (err) => {
-      console.log("Error", err);
+      this.showLoader=false;
+      this.errMessage = 'Something went wrong please try again !';
+      this.dismissAlert();
     })
   }
 
   ngOnInit(): void {
+  }
+
+  /**
+   * @description dismiss alert after 3 sec.
+   */
+  dismissAlert() {
+    setTimeout(() => {
+      this.errMessage = '';
+    }, 2000)
   }
 
 }

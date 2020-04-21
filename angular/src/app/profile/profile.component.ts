@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpService } from '../services/http.service';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storege.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-profile',
@@ -19,6 +20,7 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     const storageData = this.storage.getData('user');
     this.userProfile = (storageData && storageData.length > 10) ? JSON.parse(storageData) : false;
+    this.userProfile.age = moment().diff(moment(this.userProfile.dob, 'YYYY-MM-DD'), 'years');
   }
 
   showComponent(component) {
