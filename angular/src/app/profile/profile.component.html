@@ -7,11 +7,10 @@
 <div class="container">
     <div class="row">
         <div class="card col-sm-12 col-md-6 col-lg-4 margin-top">
-            <div class="profile-pic" (mouseenter)="showUploadButton = !showUploadButton"
-                (mouseleave)="showUploadButton = !showUploadButton">
+            <div class="profile-pic" (mouseenter)="showUploadButton = !showUploadButton">
                 <img class="card-img-top" [src]="userProfile.profileURL" alt="Card image">
-                <div class="upload-btn-wrapper" *ngIf="showUploadButton">
-                    <button class="btn-1">Change</button>
+                <div class="upload-btn-wrapper">
+                    <button class="btn-1 btn btn-secondary col logout-btn">Upload profile</button>
                     <input type="file" name="avatar" (change)="onFileChange($event)" />
                 </div>
             </div>

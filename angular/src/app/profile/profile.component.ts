@@ -48,6 +48,7 @@ export class ProfileComponent implements OnInit {
       this.showLoader = true;
       const formData = new FormData();
       formData.append('avatar', evt.target.files[0])
+      this.showUploadButton=false;
       this.http.uploadAvatar(formData, this.userProfile.Id).subscribe((response: any) => {
         this.showLoader = false;
         if (response.code) {
