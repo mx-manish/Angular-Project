@@ -39,18 +39,6 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage })
 
-
-/* GET users listing. */
-router.get('/', async function (req, res, next) {
-  try {
-    const users = await queryEngine.executeQuery("SELECT * FROM users");
-    response.sendResponse(200, 'SUCCESS', users, res);
-  } catch (err) {
-    console.log("Error", err);
-    response.sendResponse(500, 'Internal server error', err, res);
-  }
-});
-
 /* GET users login. */
 router.post('/login', async function (req, res, next) {
 
@@ -67,33 +55,6 @@ router.post('/login', async function (req, res, next) {
       response.sendResponse(200, 'SUCCESS', userRespData, res);
     } else {
       response.sendResponse(404, 'Invalid Email and password', [], res);
-    }
-  } catch (err) {
-    console.log("Error", err);
-    response.sendResponse(500, 'Internal server error', err, res);
-  }
-});
-
-
-/**
- * @description User signup 
- */
-router.post('/avatar', upload.single('avatar'), async function (req, res, next) {
-  try {
-    if (!req.headers.useragentid) {
-      response.sendResponse(400, 'Invalid request session', [], res);
-      return;
-    }
-    if (!req.file.filename) {
-      response.sendResponse(400, 'Profile not uploaded', [], res);
-      return;
-    }
-    const queryData = await queryEngine.executeQuery(`UPDATE users SET profileURL='${req.file.filename}' WHERE Id=${req.headers.useragentid}`);
-    if (queryData.affectedRows > 0) {
-      const profileURL = `http://localhost:3000/public/profile/${req.file.filename}`;
-      response.sendResponse(200, 'SUCCESS', { profileURL }, res);
-    } else {
-      response.sendResponse(404, 'Somthing went wrong while updating', [], res);
     }
   } catch (err) {
     console.log("Error", err);
@@ -144,17 +105,25 @@ router.post('/password', async function (req, res, next) {
 /**
  * @description User Profile update 
  */
-router.post('/profile', async function (req, res, next) {
+router.post('/profile', upload.single('avatar'), async function (req, res, next) {
   try {
     const userData = await reqBodyValidation(req.body, jsonSchema.userProfileSchema, errorStore.userProfileStore, res);
-    const queryData = await queryEngine.executeQuery(`UPDATE users SET name='${userData.name}', email='${userData.email}', mobile='${userData.mobile}', city='${userData.city}', dob='${userData.dob}' WHERE Id=${userData.user_id}`);
+    let profileQuery = '';
+    if (req.file && req.file.filename) {
+      // Space must be at the end of string.
+      profileQuery = `profileURL='${req.file.filename}', `;
+    }
+    const queryData = await queryEngine.executeQuery(`UPDATE users SET ${profileQuery}name='${userData.name}', email='${userData.email}', mobile='${userData.mobile}', city='${userData.city}', dob='${userData.dob}' WHERE Id=${userData.user_id}`);
     if (queryData.affectedRows > 0) {
-      response.sendResponse(200, 'SUCCESS', [], res);
+      const respObject = {};
+      if (req.file && req.file.filename) {
+        respObject.profileURL = `http://localhost:3000/public/profile/${req.file.filename}`;
+      }
+      response.sendResponse(200, 'SUCCESS', respObject, res);
     } else {
-      response.sendResponse(404, 'Somthing went wrong while updating', [], res);
+      response.sendResponse(404, 'Somthing went wrong while updating', respObject, res);
     }
   } catch (err) {
-    console.log("Error", err);
     response.sendResponse(500, 'Internal server error', err, res);
   }
 });
