@@ -15,6 +15,7 @@ export class EditProfileComponent implements OnInit {
   showLoader = false;
   @Input() userData: any;
   @Output() profileUpdated = new EventEmitter();
+  public profileImage;
   constructor(private fb: FormBuilder, private httpService: HttpService, private service: StorageService, private storage: StorageService) {
     this.initializeFormController();
   }
@@ -40,10 +41,27 @@ export class EditProfileComponent implements OnInit {
     this.profileData.controls.dob.setValue(this.userData.dob);
   }
 
+  onFileChange(evt) {
+    this.profileImage = '';
+    if (evt.target.files.length > 0) {
+      this.profileImage = evt.target.files[0];
+    }
+  }
+
   updateProfile() {
-    this.showLoader = true;
-    this.profileData.value.user_id = this.userData.Id;
-    this.httpService.updateprofile(this.profileData.value).subscribe((response: any) => {
+    this.showLoader=true;
+    let formData = new FormData();
+    formData.set('name', this.profileData.value.name);
+    formData.set('city', this.profileData.value.city);
+    formData.set('dob', this.profileData.value.dob);
+    formData.set('email', this.profileData.value.email);
+    formData.set('mobile', this.profileData.value.mobile);
+    formData.set('user_id', this.userData.Id);
+    if (this.profileImage) {
+      formData.append('avatar', this.profileImage);
+    }
+
+    this.httpService.updateprofile(formData).subscribe((response: any) => {
       this.showLoader = false;
       if (response.code === 200) {
         this.userData.email = this.profileData.value.email;
@@ -51,6 +69,7 @@ export class EditProfileComponent implements OnInit {
         this.userData.mobile = this.profileData.value.mobile;
         this.userData.city = this.profileData.value.city;
         this.userData.dob = this.profileData.value.dob;
+        this.userData.profileURL = response.data.profileURL ? response.data.profileURL : this.userData.profileURL;
         this.service.setData('user', JSON.stringify(this.userData));
         this.successMsg = response.message;
         this.dismissAlert();
@@ -61,7 +80,8 @@ export class EditProfileComponent implements OnInit {
       }
     }, (err) => {
       this.showLoader = false;
-      console.log('Error', err);
+      this.errMessage = 'Something went wrong please try again later';
+        this.dismissAlert();
     });
   }
 

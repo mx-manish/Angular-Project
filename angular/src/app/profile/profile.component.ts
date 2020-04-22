@@ -11,11 +11,7 @@ import * as moment from 'moment';
 })
 export class ProfileComponent implements OnInit {
   public userProfile;
-  public showProfile = false;
-  public showPasswordComponent = false;
-  public showUploadButton = false;
-  public showLoader = false;
-  constructor(private http: HttpService, private routing: Router, private storage: StorageService) { }
+  constructor(private routing: Router, private storage: StorageService) { }
 
   ngOnInit(): void {
     const storageData = this.storage.getData('user');
@@ -23,42 +19,9 @@ export class ProfileComponent implements OnInit {
     this.userProfile.age = moment().diff(moment(this.userProfile.dob, 'YYYY-MM-DD'), 'years');
   }
 
-  showComponent(component) {
-    if (component === 'profile') {
-      this.showPasswordComponent = false;
-      this.showProfile = !this.showProfile;
-    } else {
-      this.showProfile = false;
-      this.showPasswordComponent = !this.showPasswordComponent;
-    }
-  }
-
-  profileUpdateHandler(updateData) {
-    this.userProfile = updateData;
-  }
-
   logoutUser() {
     this.storage.clearStorage();
     this.routing.navigateByUrl('/login');
-  }
-
-  onFileChange(evt) {
-    console.log("Event taret value", evt.target.files);
-    if (evt.target.files.length > 0) {
-      this.showLoader = true;
-      const formData = new FormData();
-      formData.append('avatar', evt.target.files[0])
-      this.showUploadButton=false;
-      this.http.uploadAvatar(formData, this.userProfile.Id).subscribe((response: any) => {
-        this.showLoader = false;
-        if (response.code) {
-          this.userProfile.profileURL = response.data.profileURL;
-          this.storage.setData('user', JSON.stringify(this.userProfile));
-        }
-      }, (err) => {
-        this.showLoader = false;
-      });
-    }
   }
 
 }

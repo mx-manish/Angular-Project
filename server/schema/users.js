@@ -27,7 +27,6 @@ const userProfileSchema = {
             minLength: 10
         },
         user_id: {
-            type: 'number',
             required: true
         },
         city: {
@@ -72,7 +71,6 @@ const userProfileStore = {
         'minLength': 'City should have minimum character length of 3'
     },
     'user_id': {
-        'type': 'User Id should be of type: Number',
         'required': 'User Id is required'
     }
 }

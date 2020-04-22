@@ -1,30 +1,48 @@
-<div class="back-drop" *ngIf="showLoader">
-    <div class="loader">
-        <div class="spinner-grow text-light" style="width: 10vw; height: 10vw;" role="status">
-        </div>
-    </div>
-</div>
 <div class="container">
     <div class="row">
         <div class="card col-sm-12 col-md-6 col-lg-4 margin-top">
-            <div class="profile-pic" (mouseenter)="showUploadButton = !showUploadButton">
-                <img class="card-img-top" [src]="userProfile.profileURL" alt="Card image">
-                <div class="upload-btn-wrapper">
-                    <button class="btn-1 btn btn-secondary col logout-btn">Upload profile</button>
-                    <input type="file" name="avatar" (change)="onFileChange($event)" />
-                </div>
-            </div>
-            <button type="button" class="btn btn-secondary col logout-btn" (click)="logoutUser()">Logout</button>
+
             <div class="card-body">
-                <h4 class="card-title">{{userProfile.name}}</h4>
-                <p class="card-text">{{userProfile.email}}</p>
-                <p class="card-text">Mobile : {{userProfile.mobile}}</p>
-                <p class="card-text">CITY : {{userProfile.city}}</p>
-                <p class="card-text">DOB : {{userProfile.dob}}</p>
-                <p class="card-text" *ngIf="userProfile.age">AGE : {{userProfile.age}} Yr.</p>
+                <div class="row profile-section">
+                    <div class="col font-weight-bold"></div>
+                    <div class="col-sm-12 col-md-8 col-lg-8">
+                        <img class="avatar" [src]="userProfile.profileURL" alt="Card image">
+                        <button type="button" class="btn btn-light logout-btn font-weight-bold"
+                            (click)="logoutUser()">Logout</button>
+                    </div>
+                </div>
                 <div class="row">
-                    <a class="btn btn-dark col margin" routerLink="/update-profile" role="button">Edit Profile</a>
-                    <a class="btn btn-dark col margin" routerLink="/password" role="button">Change Password</a>
+                    <div class="col font-weight-bold">Name :</div>
+                    <div class="col-sm-12 col-md-8 col-lg-8">{{userProfile.name}}</div>
+                </div>
+                <div class="row">
+                    <div class="col font-weight-bold">Email Id :</div>
+                    <div class="col-sm-12 col-md-8 col-lg-8">{{userProfile.email}}</div>
+                </div>
+                <div class="row">
+                    <div class="col font-weight-bold">Mobile :</div>
+                    <div class="col-sm-12 col-md-8 col-lg-8">{{userProfile.mobile}}</div>
+                </div>
+                <div class="row">
+                    <div class="col font-weight-bold">CITY :</div>
+                    <div class="col-sm-12 col-md-8 col-lg-8">{{userProfile.city}}</div>
+                </div>
+                <div class="row">
+                    <div class="col font-weight-bold">DOB :</div>
+                    <div class="col-sm-12 col-md-8 col-lg-8">{{userProfile.dob}}</div>
+                </div>
+                <div class="row" *ngIf="userProfile.age">
+                    <div class="col font-weight-bold">AGE :</div>
+                    <div class="col-sm-12 col-md-8 col-lg-8">{{userProfile.age}} Yr.</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-auto"><a class="btn btn-dark form-control" routerLink="/update-profile"
+                            role="button">Edit Profile</a>
+                    </div>
+                    <div class="col">
+                        <a class="btn btn-dark form-control" routerLink="/password" role="button">Change Password</a>
+                    </div>
                 </div>
             </div>
         </div>
