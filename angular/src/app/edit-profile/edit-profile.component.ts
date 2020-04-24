@@ -3,6 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 // import { DatePipe } from '@angular/common';
 import { HttpService } from 'src/app/services/http.service';
 import { StorageService } from 'src/app/services/storege.service';
+import { Store } from '@ngrx/store';
+import { USER } from '../definitions';
+import { UserLogin } from 'src/app/store/user.actions';
 @Component({
   selector: 'app-edit-profile',
   templateUrl: './edit-profile.component.html',
@@ -16,7 +19,11 @@ export class EditProfileComponent implements OnInit {
   @Input() userData: any;
   @Output() profileUpdated = new EventEmitter();
   public profileImage;
-  constructor(private fb: FormBuilder, private httpService: HttpService, private service: StorageService, private storage: StorageService) {
+  constructor(private fb: FormBuilder,
+    private httpService: HttpService,
+    private service: StorageService,
+    private store: Store<{ userLogin: { user: USER } }>,
+    private storage: StorageService) {
     this.initializeFormController();
   }
 
@@ -49,7 +56,7 @@ export class EditProfileComponent implements OnInit {
   }
 
   updateProfile() {
-    this.showLoader=true;
+    this.showLoader = true;
     let formData = new FormData();
     formData.set('name', this.profileData.value.name);
     formData.set('city', this.profileData.value.city);
@@ -71,6 +78,7 @@ export class EditProfileComponent implements OnInit {
         this.userData.dob = this.profileData.value.dob;
         this.userData.profileURL = response.data.profileURL ? response.data.profileURL : this.userData.profileURL;
         this.service.setData('user', JSON.stringify(this.userData));
+        this.store.dispatch(new UserLogin(this.userData));
         this.successMsg = response.message;
         this.dismissAlert();
         this.profileUpdated.emit(this.userData);
@@ -81,7 +89,7 @@ export class EditProfileComponent implements OnInit {
     }, (err) => {
       this.showLoader = false;
       this.errMessage = 'Something went wrong please try again later';
-        this.dismissAlert();
+      this.dismissAlert();
     });
   }
 

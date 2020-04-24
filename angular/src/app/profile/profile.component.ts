@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpService } from '../services/http.service';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storege.service';
 import * as moment from 'moment';
+import { Store } from '@ngrx/store';
+import { USER } from '../definitions';
 
 @Component({
   selector: 'app-profile',
@@ -10,13 +11,14 @@ import * as moment from 'moment';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  public userProfile;
-  constructor(private routing: Router, private storage: StorageService) { }
+  public userProfile: USER;
+  constructor(private routing: Router, private storage: StorageService, private store: Store<{ userLogin: { user: USER } }>) { }
 
   ngOnInit(): void {
-    const storageData = this.storage.getData('user');
-    this.userProfile = (storageData && storageData.length > 10) ? JSON.parse(storageData) : false;
-    this.userProfile.age = moment().diff(moment(this.userProfile.dob, 'YYYY-MM-DD'), 'years');
+    // const storageData = this.storage.getData('user');
+    // this.userProfile = (storageData && storageData.length > 10) ? JSON.parse(storageData) : false;
+    // this.userProfile.age = moment().diff(moment(this.userProfile.dob, 'YYYY-MM-DD'), 'years');
+    this.ngrxUserData();
   }
 
   logoutUser() {
@@ -24,4 +26,12 @@ export class ProfileComponent implements OnInit {
     this.routing.navigateByUrl('/login');
   }
 
+  ngrxUserData() {
+    this.store.select('userLogin')
+      .subscribe((storageData) => {
+        console.log("user", storageData);
+        this.userProfile = storageData.user
+        this.userProfile.age = moment().diff(moment(this.userProfile.dob, 'YYYY-MM-DD'), 'years');
+      });
+  }
 }

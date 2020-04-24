@@ -4,6 +4,9 @@ import { HttpService } from 'src/app/services/http.service';
 import { ResponseObject } from 'src/app/definitions';
 import { Router } from '@angular/router';
 import { StorageService } from 'src/app/services/storege.service';
+import { Store } from '@ngrx/store';
+import { USER } from '../definitions';
+import { UserLogin } from 'src/app/store/user.actions';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -13,7 +16,12 @@ export class LoginComponent implements OnInit {
   public loginForm: FormGroup
   errMessage = '';
   showLoader = false;
-  constructor(private fb: FormBuilder, private httpService: HttpService, private router: Router, private storage: StorageService) {
+  constructor(
+    private fb: FormBuilder,
+    private httpService: HttpService,
+    private router: Router,
+    private storage: StorageService,
+    private store: Store<{ userLogin: { user: USER } }>) {
     this.initFormController();
   }
 
@@ -25,19 +33,20 @@ export class LoginComponent implements OnInit {
   }
 
   userLogin() {
-    this.showLoader=true;
+    this.showLoader = true;
     this.httpService.userLogin(this.loginForm.value).subscribe((response: ResponseObject) => {
       if (response.code === 200) {
         this.storage.setData('user', JSON.stringify(response.data));
-        this.showLoader=false;
+        this.showLoader = false;
+        this.store.dispatch(new UserLogin(response.data));
         this.router.navigate(['profile']);
       } else {
-        this.showLoader=false;
+        this.showLoader = false;
         this.errMessage = response.message;
         this.dismissAlert();
       }
     }, (err) => {
-      this.showLoader=false;
+      this.showLoader = false;
       this.errMessage = 'Something went wrong please try again !';
       this.dismissAlert();
     })

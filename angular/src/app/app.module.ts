@@ -11,7 +11,9 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
 import { UpdatePasswordComponent } from './update-password/update-password.component';
-
+// import { NgRedux, NgReduxModule } from '@angular-redux/store';
+import { userLoginReducer } from 'src/app/store/user.reducer';
+import { StoreModule } from '@ngrx/store';
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,9 +29,15 @@ import { UpdatePasswordComponent } from './update-password/update-password.compo
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    // NgReduxModule,
+    StoreModule.forRoot({ userLogin: userLoginReducer }, {})
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  // constructor(private ngRedux: NgRedux<UserStore>) {
+  //   this.ngRedux.configureStore(userReducer, {});
+  // }
+}
