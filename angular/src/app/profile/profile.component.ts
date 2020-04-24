@@ -31,7 +31,10 @@ export class ProfileComponent implements OnInit {
       .subscribe((storageData) => {
         console.log("user", storageData);
         this.userProfile = storageData.user
-        this.userProfile.age = moment().diff(moment(this.userProfile.dob, 'YYYY-MM-DD'), 'years');
+        this.userProfile = {
+          ...this.userProfile,
+          age: moment().diff(moment(this.userProfile.dob, 'YYYY-MM-DD'), 'years')
+        }
       });
   }
 }
